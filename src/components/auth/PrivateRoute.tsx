@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { Loading } from '@/components/feedback/Loading';
+import type { ReactNode } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+
+import { useAuth } from "@/hooks/useAuth";
+import { Loading } from "@/components/feedback/Loading";
 
 interface PrivateRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-export const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+export function PrivateRoute({ children }: PrivateRouteProps) {
+  const { isAuthenticated, isInitialized } = useAuth();
   const location = useLocation();
-  const [isChecking, setIsChecking] = useState(true);
 
-  useEffect(() => {
-    // Give time for auth state to initialize
-    const timer = setTimeout(() => {
-      setIsChecking(false);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isChecking) {
+  if (!isInitialized) {
     return <Loading fullScreen message="Loading..." />;
   }
 
@@ -29,6 +21,6 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   }
 
   return <>{children}</>;
-};
+}
 
 export default PrivateRoute;
