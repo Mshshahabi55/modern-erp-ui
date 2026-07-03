@@ -4,20 +4,29 @@ import { unwrapResponse } from "@/api/responseAdapter";
 export abstract class BaseApiService<T> {
   constructor(protected readonly endpoint: string) {}
 
-  async getAll(): Promise<T[]> {
-    const { data } = await apiClient.get(this.endpoint);
+  async getAll(
+    params?: Record<string, unknown>
+  ): Promise<T[]> {
+    const { data } = await apiClient.get(this.endpoint, {
+      params,
+    });
 
     return unwrapResponse<T[]>(data);
   }
 
   async getById(id: string | number): Promise<T> {
-    const { data } = await apiClient.get(`${this.endpoint}/${id}`);
+    const { data } = await apiClient.get(
+      `${this.endpoint}/${id}`
+    );
 
     return unwrapResponse<T>(data);
   }
 
   async create(payload: Partial<T>): Promise<T> {
-    const { data } = await apiClient.post(this.endpoint, payload);
+    const { data } = await apiClient.post(
+      this.endpoint,
+      payload
+    );
 
     return unwrapResponse<T>(data);
   }

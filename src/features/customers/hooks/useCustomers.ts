@@ -2,10 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 
 import { customerService } from "../services/customer.service";
 
-export function useCustomers() {
-  return useQuery({
-    queryKey: ["customers"],
+interface UseCustomersOptions {
+  search?: string;
+}
 
-    queryFn: () => customerService.getAll(),
+export function useCustomers(options?: UseCustomersOptions) {
+  return useQuery({
+    queryKey: ["customers", options?.search],
+
+    queryFn: () =>
+      customerService.getAll({
+        q: options?.search,
+      }),
   });
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   Alert,
@@ -8,12 +8,21 @@ import {
 } from "@mui/material";
 
 import { SearchBox } from "@/components/common/SearchBox";
+import { useDebounce } from "@/hooks/useDebounce";
 
 import { CustomerTable } from "../components/CustomerTable";
 import { useCustomers } from "../hooks/useCustomers";
 
+function normalize(value?: string | number): string {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[-\s]/g, "");
+}
+
 function CustomersPage() {
   const [search, setSearch] = useState("");
+
+  const debouncedSearch = useDebounce(search);
 
   const {
     data: customers,
@@ -21,6 +30,27 @@ function CustomersPage() {
     isError,
     error,
   } = useCustomers();
+
+  const filteredCustomers = useMemo(() => {
+    if (!customers) return [];
+
+    const keyword = normalize(debouncedSearch);
+
+    if (!keyword) {
+      return customers;
+    }
+
+    return customers.filter((customer) => {
+      return (
+        normalize(customer.code).includes(keyword) ||
+        normalize(customer.name).includes(keyword) ||
+        normalize(customer.company).includes(keyword) ||
+        normalize(customer.phone).includes(keyword) ||
+        normalize(customer.mobile).includes(keyword) ||
+        normalize(customer.email).includes(keyword)
+      );
+    });
+  }, [customers, debouncedSearch]);
 
   if (isLoading) {
     return (
@@ -47,32 +77,6 @@ function CustomersPage() {
     );
   }
 
-  if (!customers || customers.length === 0) {
-    return (
-      <Box p={3}>
-        <Typography
-          variant="h4"
-          fontWeight={700}
-          gutterBottom
-        >
-          Customers
-        </Typography>
-
-        <Box mb={3}>
-          <SearchBox
-            value={search}
-            onChange={setSearch}
-            placeholder="Search customers..."
-          />
-        </Box>
-
-        <Alert severity="info">
-          No customers found.
-        </Alert>
-      </Box>
-    );
-  }
-
   return (
     <Box p={3}>
       <Typography
@@ -91,7 +95,16 @@ function CustomersPage() {
         />
       </Box>
 
-      <CustomerTable customers={customers} />
+      {filteredCustomers.length === 0 ? (
+        <Alert severity="info">
+          No customers found.
+        </Alert>
+      ) : (
+        <CustomerTable
+          customers={filteredCustomers}
+          loading={isLoading}
+        />
+      )}
     </Box>
   );
 }
