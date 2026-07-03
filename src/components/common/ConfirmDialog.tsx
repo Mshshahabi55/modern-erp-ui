@@ -1,0 +1,72 @@
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+
+interface ConfirmDialogProps {
+  open: boolean;
+
+  title?: string;
+
+  message: string;
+
+  confirmText?: string;
+
+  cancelText?: string;
+
+  loading?: boolean;
+
+  onConfirm: () => void;
+
+  onClose: () => void;
+}
+
+export function ConfirmDialog({
+  open,
+  title = "Confirmation",
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  loading = false,
+  onConfirm,
+  onClose,
+}: ConfirmDialogProps) {
+  return (
+    <Dialog
+      open={open}
+      onClose={loading ? undefined : onClose}
+      fullWidth
+      maxWidth="xs"
+    >
+      <DialogTitle>{title}</DialogTitle>
+
+      <DialogContent>
+        <DialogContentText>{message}</DialogContentText>
+      </DialogContent>
+
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button
+          onClick={onClose}
+          disabled={loading}
+        >
+          {cancelText}
+        </Button>
+
+        <Button
+          variant="contained"
+          color="error"
+          onClick={onConfirm}
+          disabled={loading}
+        >
+          {loading ? "Please wait..." : confirmText}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+export default ConfirmDialog;

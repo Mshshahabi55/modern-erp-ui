@@ -3,15 +3,31 @@ import { useMemo, useState } from "react";
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
+  Stack,
   Typography,
 } from "@mui/material";
+import toast from "react-hot-toast";
 
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { SearchBox } from "@/components/common/SearchBox";
 import { useDebounce } from "@/hooks/useDebounce";
 
-import { CustomerTable } from "../components/CustomerTable";
-import { useCustomers } from "../hooks/useCustomers";
+import {
+  CustomerDialog,
+  CustomerTable,
+} from "../components";
+
+import {
+  useCustomers,
+  useCreateCustomer,
+  useUpdateCustomer,
+  useDeleteCustomer,
+} from "../hooks";
+
+import type { Customer } from "../types/customer.types";
+import type { CustomerFormValues } from "../validation/customer.schema";
 
 function normalize(value?: string | number): string {
   return String(value ?? "")
@@ -22,6 +38,17 @@ function normalize(value?: string | number): string {
 function CustomersPage() {
   const [search, setSearch] = useState("");
 
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const [selectedCustomer, setSelectedCustomer] =
+    useState<Customer | null>(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] =
+    useState(false);
+
+  const [customerToDelete, setCustomerToDelete] =
+    useState<Customer | null>(null);
+
   const debouncedSearch = useDebounce(search);
 
   const {
@@ -29,7 +56,15 @@ function CustomersPage() {
     isLoading,
     isError,
     error,
-  } = useCustomers();
+  } = useCustomers({
+    search: debouncedSearch,
+  });
+
+  const createCustomer = useCreateCustomer();
+
+  const updateCustomer = useUpdateCustomer();
+
+  const deleteCustomer = useDeleteCustomer();
 
   const filteredCustomers = useMemo(() => {
     if (!customers) return [];
@@ -51,6 +86,80 @@ function CustomersPage() {
       );
     });
   }, [customers, debouncedSearch]);
+
+  function handleAddCustomer() {
+    setSelectedCustomer(null);
+    setDialogOpen(true);
+  }
+
+  function handleEditCustomer(customer: Customer) {
+    setSelectedCustomer(customer);
+    setDialogOpen(true);
+  }
+
+  function handleDeleteCustomer(customer: Customer) {
+    setCustomerToDelete(customer);
+    setDeleteDialogOpen(true);
+  }
+
+  function handleCloseDialog() {
+    setDialogOpen(false);
+    setSelectedCustomer(null);
+  }
+
+  function handleCloseDeleteDialog() {
+    setDeleteDialogOpen(false);
+    setCustomerToDelete(null);
+  }
+
+  async function handleSubmit(
+    data: CustomerFormValues
+  ) {
+    try {
+      if (selectedCustomer) {
+        await updateCustomer.mutateAsync({
+          id: selectedCustomer.id,
+          customer: data,
+        });
+
+        toast.success(
+          "Customer updated successfully."
+        );
+      } else {
+        await createCustomer.mutateAsync(data);
+
+        toast.success(
+          "Customer created successfully."
+        );
+      }
+
+      handleCloseDialog();
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Operation failed.");
+    }
+  }
+
+  async function handleConfirmDelete() {
+    if (!customerToDelete) return;
+
+    try {
+      await deleteCustomer.mutateAsync(
+        customerToDelete.id
+      );
+
+      toast.success(
+        "Customer deleted successfully."
+      );
+
+      handleCloseDeleteDialog();
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Delete failed.");
+    }
+  }
 
   if (isLoading) {
     return (
@@ -79,13 +188,26 @@ function CustomersPage() {
 
   return (
     <Box p={3}>
-      <Typography
-        variant="h4"
-        fontWeight={700}
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
         mb={3}
       >
-        Customers
-      </Typography>
+        <Typography
+          variant="h4"
+          fontWeight={700}
+        >
+          Customers
+        </Typography>
+
+        <Button
+          variant="contained"
+          onClick={handleAddCustomer}
+        >
+          Add Customer
+        </Button>
+      </Stack>
 
       <Box mb={3}>
         <SearchBox
@@ -103,8 +225,32 @@ function CustomersPage() {
         <CustomerTable
           customers={filteredCustomers}
           loading={isLoading}
+          onEdit={handleEditCustomer}
+          onDelete={handleDeleteCustomer}
         />
       )}
+
+      <CustomerDialog
+        open={dialogOpen}
+        customer={selectedCustomer}
+        loading={
+          createCustomer.isPending ||
+          updateCustomer.isPending
+        }
+        onClose={handleCloseDialog}
+        onSubmit={handleSubmit}
+      />
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        title="Delete Customer"
+        message={`Are you sure you want to delete "${customerToDelete?.name ?? ""}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        loading={deleteCustomer.isPending}
+        onConfirm={handleConfirmDelete}
+        onClose={handleCloseDeleteDialog}
+      />
     </Box>
   );
 }

@@ -1,7 +1,7 @@
 {
   "customers": [
     {
-      "id": 1,
+      "id": "1",
       "code": "CUS-001",
       "name": "John Smith",
       "company": "Microsoft",
@@ -15,7 +15,7 @@
       "isActive": true
     },
     {
-      "id": 2,
+      "id": "2",
       "code": "CUS-002",
       "name": "Alice Brown",
       "company": "Google",
@@ -29,7 +29,7 @@
       "isActive": true
     },
     {
-      "id": 3,
+      "id": "3",
       "code": "CUS-003",
       "name": "David Wilson",
       "company": "Amazon",
@@ -41,6 +41,16 @@
       "postalCode": "98001",
       "creditLimit": 12000,
       "isActive": true
+    },
+    {
+      "code": "CUS-004",
+      "name": "Mohammad Shahabihamzekolahei",
+      "company": "free",
+      "mobile": "0449538728",
+      "email": "mshshahabi55@gmail.com",
+      "creditLimit": 100,
+      "id": "YY0UzUog8Jc"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

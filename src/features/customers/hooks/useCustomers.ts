@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-
 import { customerService } from "../services/customer.service";
 
 interface UseCustomersOptions {
@@ -7,12 +6,13 @@ interface UseCustomersOptions {
 }
 
 export function useCustomers(options?: UseCustomersOptions) {
-  return useQuery({
-    queryKey: ["customers", options?.search],
+  const params = {
+    ...(options?.search ? { q: options.search } : {}),
+  };
 
-    queryFn: () =>
-      customerService.getAll({
-        q: options?.search,
-      }),
+  return useQuery({
+    queryKey: ["customers", { search: options?.search }],
+    queryFn: () => customerService.getAll(params),
+    staleTime: 5 * 60 * 1000,
   });
 }
