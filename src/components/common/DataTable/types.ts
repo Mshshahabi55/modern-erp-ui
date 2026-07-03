@@ -1,4 +1,7 @@
-import type { GridColDef } from "@mui/x-data-grid";
+import type {
+  GridColDef,
+  GridRowSelectionModel,
+} from "@mui/x-data-grid";
 
 export interface DataTableProps<T> {
   rows: T[];
@@ -8,4 +11,14 @@ export interface DataTableProps<T> {
   loading?: boolean;
 
   pageSize?: number;
+
+  checkboxSelection?: boolean;
+
+  rowSelectionModel?: GridRowSelectionModel;
+
+  onRowSelectionModelChange?: (
+    model: GridRowSelectionModel
+  ) => void;
+
+  getRowId?: (row: T) => string | number;
 }
