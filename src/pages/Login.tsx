@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   Alert,
@@ -15,7 +15,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import { Controller, useForm } from "react-hook-form";
@@ -24,6 +23,7 @@ import { z } from "zod";
 
 import { AppButton } from "@/components/common/AppButton";
 import { useAuth } from "@/hooks/useAuth";
+import { ROUTES } from "@/constants/routes";
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -39,13 +39,19 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { login, isLoading, isAuthenticated, isInitialized } = useAuth();
+  const {
+    login,
+    isLoading,
+    isAuthenticated,
+    isInitialized,
+  } = useAuth();
 
   const [error, setError] = useState<string>();
-
   const [showPassword, setShowPassword] = useState(false);
 
-  const from = location.state?.from?.pathname ?? "/dashboard";
+  const from =
+    (location.state as { from?: { pathname: string } } | null)?.from
+      ?.pathname ?? ROUTES.DASHBOARD;
 
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
@@ -107,7 +113,7 @@ export default function Login() {
               height: 56,
               borderRadius: 3,
               bgcolor: "primary.main",
-              color: "white",
+              color: "#fff",
               mb: 2,
               fontSize: 28,
             }}
@@ -115,17 +121,21 @@ export default function Login() {
             📊
           </Box>
 
-          <Typography variant="h5" fontWeight={700} gutterBottom>
+          <Typography variant="h5" fontWeight={700}>
             ERP Management System
           </Typography>
 
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mt: 1 }}
+          >
             Sign in to continue
           </Typography>
         </Box>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
             {error}
           </Alert>
         )}
@@ -221,11 +231,7 @@ export default function Login() {
 
               <Link
                 href="#"
-                variant="body2"
-                sx={{
-                  textDecoration: "none",
-                  fontWeight: 500,
-                }}
+                underline="hover"
                 onClick={(e) => e.preventDefault()}
               >
                 Forgot password?
@@ -235,11 +241,10 @@ export default function Login() {
             <AppButton
               type="submit"
               variant="contained"
-              size="large"
               fullWidth
+              size="large"
               loading={isLoading}
               disabled={isLoading}
-              sx={{ mt: 1 }}
             >
               Sign In
             </AppButton>
@@ -247,21 +252,20 @@ export default function Login() {
         </form>
 
         <Divider sx={{ my: 3 }}>
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption">
             Demo Credentials
           </Typography>
         </Divider>
 
-        <Box sx={{ textAlign: "center" }}>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: "block" }}
-          >
-            Username: <strong>admin</strong> | Password:{" "}
-            <strong>admin123</strong>
-          </Typography>
-        </Box>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          align="center"
+          display="block"
+        >
+          Username: <strong>admin</strong> | Password:{" "}
+          <strong>admin123</strong>
+        </Typography>
 
         <Box
           sx={{

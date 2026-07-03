@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "@/hooks/useAuth";
 import { Loading } from "@/components/feedback/Loading";
+import { ROUTES } from "@/constants/routes";
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -17,7 +18,13 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to={ROUTES.AUTH.LOGIN}
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
   return <>{children}</>;

@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 
 import { AuthContext } from "./AuthContext";
 import { authService } from "@/services/auth.service";
+import { storageService } from "@/services/storage/storage.service";
+
 import type { LoginCredentials, User } from "@/types/auth.types";
 
 interface Props {
@@ -13,27 +15,24 @@ interface Props {
 
 export function AuthProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("auth_token");
-    const storedUser = localStorage.getItem("user");
+    const initializeAuth = () => {
+      const token = storageService.getToken();
+      const storedUser = storageService.getUser();
 
-    if (token && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser) as User;
-
-        setUser(parsedUser);
+      if (token && storedUser) {
+        setUser(storedUser);
         setIsAuthenticated(true);
-      } catch {
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("user");
       }
-    }
 
-    setIsInitialized(true);
+      setIsInitialized(true);
+    };
+
+    initializeAuth();
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
@@ -46,11 +45,11 @@ export function AuthProvider({ children }: Props) {
         throw new Error(response.error ?? "Login failed");
       }
 
+      storageService.setToken(response.token ?? "");
+      storageService.setUser(response.user);
+
       setUser(response.user);
       setIsAuthenticated(true);
-
-      localStorage.setItem("auth_token", response.token ?? "");
-      localStorage.setItem("user", JSON.stringify(response.user));
 
       toast.success("Welcome back!");
     } catch (error) {
@@ -65,11 +64,10 @@ export function AuthProvider({ children }: Props) {
   }, []);
 
   const logout = useCallback(() => {
+    storageService.clear();
+
     setUser(null);
     setIsAuthenticated(false);
-
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user");
 
     toast.success("Logged out successfully");
   }, []);
@@ -78,8 +76,8 @@ export function AuthProvider({ children }: Props) {
     <AuthContext.Provider
       value={{
         user,
-        isLoading,
         isAuthenticated,
+        isLoading,
         isInitialized,
         login,
         logout,
@@ -89,3 +87,5 @@ export function AuthProvider({ children }: Props) {
     </AuthContext.Provider>
   );
 }
+
+export default AuthProvider;
