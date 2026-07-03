@@ -1,9 +1,20 @@
-import { Alert, Box, CircularProgress, Typography } from "@mui/material";
+import { useState } from "react";
+
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Typography,
+} from "@mui/material";
+
+import { SearchBox } from "@/components/common/SearchBox";
 
 import { CustomerTable } from "../components/CustomerTable";
 import { useCustomers } from "../hooks/useCustomers";
 
 function CustomersPage() {
+  const [search, setSearch] = useState("");
+
   const {
     data: customers,
     isLoading,
@@ -39,9 +50,21 @@ function CustomersPage() {
   if (!customers || customers.length === 0) {
     return (
       <Box p={3}>
-        <Typography variant="h4" gutterBottom>
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          gutterBottom
+        >
           Customers
         </Typography>
+
+        <Box mb={3}>
+          <SearchBox
+            value={search}
+            onChange={setSearch}
+            placeholder="Search customers..."
+          />
+        </Box>
 
         <Alert severity="info">
           No customers found.
@@ -59,6 +82,14 @@ function CustomersPage() {
       >
         Customers
       </Typography>
+
+      <Box mb={3}>
+        <SearchBox
+          value={search}
+          onChange={setSearch}
+          placeholder="Search customers..."
+        />
+      </Box>
 
       <CustomerTable customers={customers} />
     </Box>
