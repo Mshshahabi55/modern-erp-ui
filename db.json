@@ -1,0 +1,46 @@
+{
+  "customers": [
+    {
+      "id": 1,
+      "code": "CUS-001",
+      "name": "John Smith",
+      "company": "Microsoft",
+      "phone": "555123456",
+      "mobile": "555999999",
+      "email": "john@microsoft.com",
+      "address": "Seattle",
+      "city": "Seattle",
+      "postalCode": "98101",
+      "creditLimit": 5000,
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "code": "CUS-002",
+      "name": "Alice Brown",
+      "company": "Google",
+      "phone": "555777777",
+      "mobile": "555888888",
+      "email": "alice@google.com",
+      "address": "California",
+      "city": "Mountain View",
+      "postalCode": "94043",
+      "creditLimit": 8000,
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "code": "CUS-003",
+      "name": "David Wilson",
+      "company": "Amazon",
+      "phone": "555111111",
+      "mobile": "555222222",
+      "email": "david@amazon.com",
+      "address": "Washington",
+      "city": "Seattle",
+      "postalCode": "98001",
+      "creditLimit": 12000,
+      "isActive": true
+    }
+  ]
+}
