@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import { Box } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import {
   DataGrid,
+  GridActionsCellItem,
+  type GridColDef,
   type GridPaginationModel,
 } from "@mui/x-data-grid";
 
 import type { DataTableProps } from "./types";
 
-export function DataTable<T extends { id: string | number }>({
+export function DataTable<
+  T extends { id: string | number }
+>({
   rows,
   columns,
   loading = false,
@@ -18,6 +29,8 @@ export function DataTable<T extends { id: string | number }>({
   rowSelectionModel,
   onRowSelectionModelChange,
   getRowId,
+  onEdit,
+  onDelete,
 }: DataTableProps<T>) {
   const [paginationModel, setPaginationModel] =
     useState<GridPaginationModel>({
@@ -25,11 +38,64 @@ export function DataTable<T extends { id: string | number }>({
       pageSize,
     });
 
+  const finalColumns = useMemo<GridColDef[]>(() => {
+    if (!onEdit && !onDelete) {
+      return columns;
+    }
+
+    return [
+      ...columns,
+      {
+        field: "actions",
+        type: "actions",
+        headerName: "Actions",
+        width: 110,
+        getActions: (params) => {
+          const row = params.row as T;
+
+          const actions = [];
+
+          if (onEdit) {
+            actions.push(
+              <GridActionsCellItem
+                key="edit"
+                icon={
+                  <Tooltip title="Edit">
+                    <EditIcon />
+                  </Tooltip>
+                }
+                label="Edit"
+                onClick={() => onEdit(row)}
+              />
+            );
+          }
+
+          if (onDelete) {
+            actions.push(
+              <GridActionsCellItem
+                key="delete"
+                icon={
+                  <Tooltip title="Delete">
+                    <DeleteIcon />
+                  </Tooltip>
+                }
+                label="Delete"
+                onClick={() => onDelete(row)}
+              />
+            );
+          }
+
+          return actions;
+        },
+      },
+    ];
+  }, [columns, onEdit, onDelete]);
+
   return (
     <Box sx={{ width: "100%" }}>
       <DataGrid
         rows={rows}
-        columns={columns}
+        columns={finalColumns}
         loading={loading}
         autoHeight
         pagination
@@ -39,7 +105,9 @@ export function DataTable<T extends { id: string | number }>({
         disableRowSelectionOnClick
         checkboxSelection={checkboxSelection}
         rowSelectionModel={rowSelectionModel}
-        onRowSelectionModelChange={onRowSelectionModelChange}
+        onRowSelectionModelChange={
+          onRowSelectionModelChange
+        }
         getRowId={getRowId}
         density="standard"
         sx={{

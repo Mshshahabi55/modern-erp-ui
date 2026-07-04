@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { queryKeys } from "@/lib/react-query/queryKeys";
+
 import { customerService } from "../services/customer.service";
+
 import type { Customer } from "../types/customer.types";
 
 export function useCreateCustomer() {
@@ -10,9 +13,9 @@ export function useCreateCustomer() {
     mutationFn: (customer: Partial<Customer>) =>
       customerService.create(customer),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["customers"],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.customers.all,
       });
     },
   });
@@ -28,12 +31,11 @@ export function useUpdateCustomer() {
     }: {
       id: number | string;
       customer: Partial<Customer>;
-    }) =>
-      customerService.update(id, customer),
+    }) => customerService.update(id, customer),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["customers"],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.customers.all,
       });
     },
   });
@@ -43,12 +45,11 @@ export function useDeleteCustomer() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number | string) =>
-      customerService.delete(id),
+    mutationFn: (id: number | string) => customerService.delete(id),
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["customers"],
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.customers.all,
       });
     },
   });

@@ -8,10 +8,12 @@ import { Loading } from "@/components/feedback/Loading";
 import { ROUTES } from "@/constants/routes";
 
 // Auth
-const Login = lazy(() => import("@/pages/Login"));
+const Login = lazy(
+  () => import("@/features/auth/pages/Login")
+);
 
 // Dashboard
-const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const Dashboard = lazy(() => import("@/features/dashboard/pages/Dashboard"));
 
 // Customers (Feature-Based)
 const Customers = lazy(
@@ -19,10 +21,10 @@ const Customers = lazy(
 );
 
 // Temporary Pages (will migrate later)
-const Products = lazy(() => import("@/pages/Products"));
-const Orders = lazy(() => import("@/pages/Orders"));
-const Settings = lazy(() => import("@/pages/Settings"));
-const Profile = lazy(() => import("@/pages/Profile"));
+const Products = lazy(() => import("@/features/products/pages/Products"));
+const Orders = lazy(() => import("@/features/orders/pages/Orders"));
+const Settings = lazy(() => import("@/features/settings/pages/Settings"));
+const Profile = lazy(() => import("@/features/profile/pages/Profile"));
 
 const withSuspense = (component: React.ReactNode) => (
   <Suspense fallback={<Loading fullScreen message="Loading page..." />}>

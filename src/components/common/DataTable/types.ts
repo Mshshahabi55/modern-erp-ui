@@ -1,9 +1,10 @@
 import type {
   GridColDef,
+  GridRowId,
   GridRowSelectionModel,
 } from "@mui/x-data-grid";
 
-export interface DataTableProps<T> {
+export interface DataTableProps<T extends { id: string | number }> {
   rows: T[];
 
   columns: GridColDef[];
@@ -20,5 +21,9 @@ export interface DataTableProps<T> {
     model: GridRowSelectionModel
   ) => void;
 
-  getRowId?: (row: T) => string | number;
+  getRowId?: (row: T) => GridRowId;
+
+  onEdit?: (row: T) => void;
+
+  onDelete?: (row: T) => void;
 }

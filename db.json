@@ -50,6 +50,15 @@
       "email": "mshshahabi55@gmail.com",
       "creditLimit": 100,
       "id": "YY0UzUog8Jc"
+    },
+    {
+      "code": "65200",
+      "name": "mohammadTest",
+      "company": "test",
+      "mobile": "0449528891",
+      "email": "mshshahabi55@gmail.com",
+      "creditLimit": 0,
+      "id": "Ck549P9eWbw"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
